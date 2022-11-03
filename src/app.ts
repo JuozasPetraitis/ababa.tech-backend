@@ -2,7 +2,7 @@ import express, { Express, json, Request, Response } from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import signUpController from "./controllers/signUpController";
+import { signUpController, loginController } from "./controllers";
 
 dotenv.config();
 const app: Express = express();
@@ -27,3 +27,4 @@ app.listen(PORT, () => {
 app.get("/", (req: Request, res: Response) => res.json("API is working"));
 
 app.post("/api/sign-up", signUpController);
+app.post("/api/login", loginController);

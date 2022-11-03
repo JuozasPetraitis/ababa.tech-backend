@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import User from "../models/User";
-import bcrypt from "bcrypt";
+import { User } from "../models";
+import { hash } from "bcrypt";
 
 const signUpController = async (req: Request, res: Response) => {
   const userInfo = await req.body;
@@ -17,19 +17,24 @@ const signUpController = async (req: Request, res: Response) => {
   }
 
   const isEmailAvailable = await User.findOne({ email: email });
-  if (isEmailAvailable) res.status(400).json({ error: true, message: "Email already exists" });
+  if (isEmailAvailable) {
+    return res.status(400).json({ error: true, message: "Email already exists" });
+  }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hash(password, 10);
 
-  const userInfoToMongo = {
+  const userInfoToMongoDB = {
     username: username,
     email: email,
     password: hashedPassword,
   };
 
-  const user = await User.create(userInfoToMongo);
+  const savedUser = await User.create(userInfoToMongoDB);
+  if (savedUser) {
+    return res.status(201).json({ error: false, message: "User created" });
+  }
 
-  res.status(201).json({ error: false });
+  return res.status(500).json({ error: true, message: "Error in the server" });
 };
 
 export default signUpController;
