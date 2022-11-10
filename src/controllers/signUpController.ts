@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import { User } from "../models";
 import { hash } from "bcrypt";
+import { generateToken } from "../utils";
 
 const signUpController = async (req: Request, res: Response) => {
   const userInfo = await req.body;
+  const { username, email, password } = userInfo;
 
-  if (!userInfo) {
+  if (!username || !email || !password) {
     return res.status(400).json({ error: true, message: "Inputs are not valid" });
   }
-
-  const { username, email, password } = userInfo;
 
   const isUsernameAvailable = await User.findOne({ username: username });
   if (isUsernameAvailable) {
@@ -30,8 +30,9 @@ const signUpController = async (req: Request, res: Response) => {
   };
 
   const savedUser = await User.create(userInfoToMongoDB);
+  const accessToken = generateToken(savedUser._id);
   if (savedUser) {
-    return res.status(201).json({ error: false, message: "User created" });
+    return res.status(201).json({ error: false, user: savedUser, accessToken: accessToken });
   }
 
   return res.status(500).json({ error: true, message: "Error in the server" });

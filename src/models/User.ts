@@ -1,14 +1,6 @@
 import { Schema, model } from "mongoose";
-
-interface Movie {
-  id: number;
-  title: string;
-  date: number;
-  rating: number;
-  storyline: string;
-  thumbnail: string;
-  stars: string[];
-}
+import Movie from "./Movie";
+import { movieSchema } from "./Movie";
 
 interface User {
   username: string;
@@ -24,7 +16,7 @@ const userSchema = new Schema<User>({
     type: String,
     required: true,
   },
-  movies: Array<Movie>,
+  movies: [movieSchema],
 });
 
 const User = model<User>("User", userSchema, "Users");
